@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout sources
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -36,8 +37,13 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and analyze (skip tests)
+      - name: Build and analyze with SonarCloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B clean install -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        run: |
+          mvn -B clean install -DskipTests \
+            -Dsonar.projectKey=neineic_keycloak \
+            -Dsonar.organization=neineic \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+
